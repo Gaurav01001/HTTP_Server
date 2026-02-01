@@ -10,16 +10,23 @@ public class Main {
     // TODO: Uncomment the code below to pass the first stage
     
     try {
-      ServerSocket serverSocket = new ServerSocket(4221);
+      ServerSocket serverSocket = new ServerSocket(4221);// create a tcp server binding it to port 4221
     
       // Since the tester restarts your program quite often, setting SO_REUSEADDR
       // ensures that we don't run into 'Address already in use' errors
-      serverSocket.setReuseAddress(true);
-    
-      serverSocket.accept(); // Wait for connection from client.
+      serverSocket.setReuseAddress(true);// basically allows reusing same port 
+    while (true)
+{      Socket clientSocket = serverSocket.accept(); // Wait for connection from client.
+      clientSocket.getOutputStream().write(
+        "HTTP/1.1 200 OK\r\n\r\n".getBytes()
+      );
+      
       System.out.println("accepted new connection");
+}
     } catch (IOException e) {
       System.out.println("IOException: " + e.getMessage());
     }
   }
 }
+
+

@@ -21,22 +21,38 @@ public class Main {
     while (true)
 {      
   Socket clientsSocket = serverSocket.accept();
+  
   BufferedReader in = new BufferedReader(new InputStreamReader(clientsSocket.getInputStream()));
   OutputStream out = clientsSocket.getOutputStream();
 
   String requestLine = in.readLine();
-  System.out.println("Requested: " + requestLine);
-  String path=" ";
 
-  if(requestLine != null){
-    String[] parts = requestLine.split("");
+  System.out.println("Requested: " + requestLine);
+  String path="";
+
+
+
+if (requestLine != null) {
+    String[] parts = requestLine.split(" ");
     path = parts[1];
-  }
-  if(path.equals("/")){
-    out.write("HTTP/1.1 200 OK\r\n\r\n".getBytes());
-  }else{
-    out.write("HTTP/1.1 400 Not Found\r\n\r\n".getBytes());
-  }
+}
+
+if (path.startsWith("/echo/")) {
+    String echoStr = path.substring("/echo/".length());
+  int length = echoStr.getBytes().length;
+String resp =
+    "HTTP/1.1 200 OK\r\n" +
+    "Content-Type: text/plain\r\n" +
+    "Content-Length: " + echoStr.getBytes().length + "\r\n" +
+    "\r\n" +   
+    echoStr;
+
+  out.write(resp.getBytes());
+
+} else {
+    out.write("HTTP/1.1 404 Not Found\r\n\r\n".getBytes());
+}
+
   clientsSocket.close();
 }
     } catch (IOException e) {

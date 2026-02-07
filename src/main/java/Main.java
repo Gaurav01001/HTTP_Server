@@ -25,31 +25,58 @@ public class Main {
   BufferedReader in = new BufferedReader(new InputStreamReader(clientsSocket.getInputStream()));
   OutputStream out = clientsSocket.getOutputStream();
 
-  String requestLine = in.readLine();
+  String requestLine = in.readLine();//to read each line of http request 
+  
 
   System.out.println("Requested: " + requestLine);
-  String path="";
-
-
-
-if (requestLine != null) {
+  
+  String path="";//creates an empty string for the url path the client makes a request.
+if (requestLine != null) { 
     String[] parts = requestLine.split(" ");
     path = parts[1];
 }
+//Read Header 
 
+String line;
+String userAgent = " ";
+while((line=in.readLine()) != null && !line.isEmpty()){
+  
+  if(line.startsWith("User-Agent:")){
+    userAgent = line.substring("User-Agent:".length()).trim();
+    
+
+  }
+  System.out.println("HEADER: " + line);
+}
+
+//Routing
 if (path.startsWith("/echo/")) {
     String echoStr = path.substring("/echo/".length());
-  int length = echoStr.getBytes().length;
+  byte[] body = echoStr.getBytes();
 String resp =
     "HTTP/1.1 200 OK\r\n" +
     "Content-Type: text/plain\r\n" +
     "Content-Length: " + echoStr.getBytes().length + "\r\n" +
-    "\r\n" +   
-    echoStr;
+    "\r\n" ;
 
   out.write(resp.getBytes());
+  out.write(body);
 
-} else {
+}
+else if (path.equals("/user-agent"))
+
+{
+  byte[] body = userAgent.getBytes();
+  String resp =
+  "HTTP/1.1 200 OK\r\n" +
+  "Content-Type: text/plain\r\n" + 
+  "Content-Length: " + body.length + "\r\n"
+  + "\r\n";
+  out.write(resp.getBytes());
+  out.write(body);
+}
+
+else {
     out.write("HTTP/1.1 404 Not Found\r\n\r\n".getBytes());
 }
 
@@ -60,5 +87,5 @@ String resp =
     }
   }
 }
-
+//Completed Read header 
 
